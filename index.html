@@ -32,8 +32,9 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html { -webkit-text-size-adjust: 100%; }
   body {
-    background: var(--white);
-    color: var(--black);
+    background: var(--midnight);
+    color: var(--white);
+    color-scheme: dark;
     font-family: var(--font-body);
     font-weight: 400;
     font-size: 15px;
@@ -47,6 +48,7 @@
   .bar {
     background: var(--midnight);
     height: 64px;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
     display: flex;
     align-items: center;
     padding: 0 var(--gutter);
@@ -66,18 +68,18 @@
     font-size: clamp(30px, 4.4vw, 44px); line-height: 1.1; letter-spacing: -.02em;
     margin-top: 10px;
   }
-  .lede { color: #5b5b5b; max-width: 56ch; margin-top: 12px; }
+  .lede { color: #a9acbb; max-width: 56ch; margin-top: 12px; }
 
   /* ── Filters ── */
   .filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 22px var(--gutter) 6px; max-width: 1480px; margin: 0 auto; }
   .chip {
     font-family: var(--font-head); font-weight: 600; font-size: 13px;
     padding: 8px 16px; border-radius: 999px;
-    background: var(--mist); color: var(--black);
+    background: rgba(255, 255, 255, .09); color: var(--white);
     transition: background .25s var(--ease), color .25s var(--ease), transform .25s var(--ease);
   }
-  .chip:hover { transform: translateY(-2px); background: var(--cloud); }
-  .chip[aria-pressed="true"] { background: var(--midnight); color: var(--white); }
+  .chip:hover { transform: translateY(-2px); background: rgba(255, 255, 255, .16); }
+  .chip[aria-pressed="true"] { background: var(--electric-blue); color: var(--white); }
   .chip:focus-visible, .card:focus-visible, .lb button:focus-visible, .lb a:focus-visible { outline: 2px solid var(--electric-blue); outline-offset: 3px; }
 
   /* ── Masonry grid ── */
@@ -86,7 +88,7 @@
   /* live previews: Instagram/TikTok players need at least ~326px of width */
   .grid.previews { columns: 326px; }
   @media (max-width: 560px) { .grid.previews { columns: 1; } }
-  .media.live { background: var(--white); border: 1px solid var(--mist); }
+  .media.live { background: var(--white); border: 0; }
   .media.live iframe { display: block; width: 100%; height: 100%; border: 0; }
   .card:hover .media.live { transform: none; box-shadow: none; }
   div.card { cursor: default; }
@@ -98,20 +100,21 @@
     transition: transform .3s var(--ease), background .3s var(--ease);
   }
   .pbtn:hover { transform: translateY(-2px); background: #3148e8; }
-  .pbtn[aria-pressed="true"] { background: var(--midnight); }
-  .pnote { color: var(--grey); font-size: 12px; max-width: 46ch; }
+  .pbtn[aria-pressed="true"] { background: rgba(255, 255, 255, .12); }
+  .pnote { color: #8a8d9c; font-size: 12px; max-width: 46ch; }
   .card { display: block; width: 100%; text-align: left; break-inside: avoid; margin-bottom: 22px; }
   .media {
     position: relative; overflow: hidden; border-radius: var(--radius);
-    background: var(--midnight);
+    background: var(--black);
     transition: transform .5s var(--ease), box-shadow .5s var(--ease);
   }
-  .card:hover .media { transform: translateY(-4px); box-shadow: 0 18px 40px -16px rgba(5, 7, 20, .55); }
+  .card:hover .media { transform: translateY(-4px); box-shadow: 0 18px 40px -14px rgba(0, 0, 0, .8); }
   .media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .media.ph {
     background:
       radial-gradient(120% 80% at 50% 0%, rgba(69, 92, 255, .55), rgba(69, 92, 255, 0) 60%),
-      linear-gradient(160deg, var(--deep-blue), var(--midnight) 70%);
+      linear-gradient(160deg, var(--deep-blue), #0b1030 75%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
   }
   .ph .net {
     position: absolute; left: 0; right: 0; bottom: 14px; text-align: center;
@@ -137,7 +140,7 @@
 
   .empty { padding: 80px var(--gutter); max-width: 1480px; margin: 0 auto; color: var(--grey); }
 
-  footer { border-top: 1px solid var(--mist); padding: 22px var(--gutter); color: var(--grey); font-size: 12px; text-align: center; }
+  footer { border-top: 1px solid rgba(255, 255, 255, .08); padding: 22px var(--gutter); color: var(--grey); font-size: 12px; text-align: center; }
 
   /* ── Lightbox ── */
   .lb {
@@ -181,8 +184,8 @@
   <h1>Precise Tenerife – Video References</h1>
   <p class="lede" id="lede">Videos we are collecting as direction for the Precise content. Tap any card to watch it.</p>
   <div class="pbar" id="pbar" hidden>
-    <button class="pbtn" id="pbtn" type="button" aria-pressed="false">Show live previews</button>
-    <span class="pnote">Previews load straight from Instagram and TikTok, which may set their own cookies. Off by default.</span>
+    <button class="pbtn" id="pbtn" type="button" aria-pressed="true">Hide live previews</button>
+    <span class="pnote">Previews load straight from Instagram and TikTok, which may set their own cookies. You can turn them off.</span>
   </div>
 </section>
 
@@ -252,7 +255,7 @@
 
   var $ = function (id) { return document.getElementById(id); };
   var grid = $("grid"), filtersEl = $("filters"), emptyEl = $("empty");
-  var active = "All", shown = [], current = -1, previewsOn = false;
+  var active = "All", shown = [], current = -1, previewsOn = true;
 
   function el(tag, cls, text) {
     var n = document.createElement(tag);
